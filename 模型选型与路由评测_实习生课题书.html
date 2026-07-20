@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课题书 · 内部基座模型「能力评测 + 任务路由」系统</title>
+<style>
+  :root{
+    --navy:#1f3a5f; --slate:#34495e; --ink:#1a1a1a; --mut:#5b6b7b;
+    --line:#e2e8f0; --bg:#f7f9fc; --card:#ffffff;
+    --accent:#2563a8; --warn:#b4530a; --warnbg:#fff4ea; --gate:#a11d33; --gatebg:#fdeef1;
+    --ok:#1d6f42; --okbg:#eef7f1; --code:#eef2f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+    line-height:1.75; font-size:15.5px;
+  }
+  .wrap{max-width:940px; margin:0 auto; padding:0 24px 80px;}
+  header.top{
+    background:linear-gradient(135deg,var(--navy),var(--slate)); color:#fff;
+    padding:46px 24px 38px; margin-bottom:0;
+  }
+  header.top .inner{max-width:940px; margin:0 auto;}
+  header.top .kicker{font-size:13px; letter-spacing:2px; opacity:.78; text-transform:uppercase;}
+  header.top h1{font-size:30px; margin:10px 0 8px; font-weight:700; line-height:1.3;}
+  header.top .sub{font-size:16px; opacity:.92;}
+  header.top .meta{margin-top:18px; font-size:13px; opacity:.8; border-top:1px solid rgba(255,255,255,.2); padding-top:14px;}
+  header.top .meta span{margin-right:22px;}
+  h2{font-size:21px; color:var(--navy); margin:42px 0 14px; padding-bottom:8px; border-bottom:2px solid var(--line);}
+  h2 .n{color:var(--accent); font-weight:700; margin-right:8px;}
+  h3{font-size:17px; color:var(--slate); margin:26px 0 8px;}
+  p{margin:10px 0;}
+  ul,ol{margin:10px 0; padding-left:24px;}
+  li{margin:5px 0;}
+  code{background:var(--code); padding:2px 6px; border-radius:4px; font-size:13.5px;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace; color:#334;}
+  pre{background:#1e293b; color:#e2e8f0; padding:14px 16px; border-radius:8px; overflow-x:auto;
+    font-size:13px; line-height:1.6; font-family:"SFMono-Regular",Consolas,monospace;}
+  table{border-collapse:collapse; width:100%; margin:16px 0; font-size:14px; background:var(--card);}
+  th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top;}
+  th{background:#eef2f8; color:var(--navy); font-weight:600;}
+  tr:nth-child(even) td{background:#fafbfd;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:20px 22px; margin:16px 0;
+    box-shadow:0 1px 2px rgba(0,0,0,.03);}
+  .callout{border-radius:8px; padding:14px 18px; margin:16px 0; font-size:14.5px;}
+  .gate{background:var(--gatebg); border-left:4px solid var(--gate);}
+  .gate b{color:var(--gate);}
+  .warn{background:var(--warnbg); border-left:4px solid var(--warn);}
+  .warn b{color:var(--warn);}
+  .ok{background:var(--okbg); border-left:4px solid var(--ok);}
+  .ok b{color:var(--ok);}
+  .tag{display:inline-block; font-size:12px; padding:2px 9px; border-radius:12px; font-weight:600; white-space:nowrap;}
+  .t-cheap{background:#e7f0fb; color:#1d4e89;}
+  .t-strong{background:#f3e8fb; color:#6b2a91;}
+  .t-mid{background:#fff1da; color:#915311;}
+  .toc{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 24px; margin:26px 0;}
+  .toc ol{columns:2; column-gap:36px; margin:6px 0 0; font-size:14px;}
+  .toc a{color:var(--accent); text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .deliv{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px dashed var(--line);}
+  .deliv:last-child{border-bottom:none;}
+  .deliv .d-id{flex:0 0 56px; font-weight:700; color:var(--accent);}
+  .lead{font-size:16px; color:var(--mut);}
+  .small{font-size:13px; color:var(--mut);}
+  .ex{background:#f4f7fb; border:1px solid var(--line); border-radius:8px; padding:12px 16px; margin:10px 0;}
+  .ex .lbl{font-size:12px; font-weight:700; color:var(--accent); letter-spacing:.5px;}
+  .footer{margin-top:56px; padding-top:20px; border-top:2px solid var(--line); font-size:13px; color:var(--mut);}
+  @media print{
+    body{background:#fff;} .card,.callout{box-shadow:none;}
+    header.top{background:var(--navy)!important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .toc{display:none;}
+  }
+  @media(max-width:680px){ .toc ol{columns:1;} header.top h1{font-size:24px;} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div class="kicker">实习生课题书 · Internal Project Brief</div>
+    <h1>内部基座模型「能力评测 + 任务路由」系统</h1>
+    <div class="sub">为新进任务自动选出最合适的模型 —— 在小数据约束下做到可评测、可路由、可省成本</div>
+    <div class="meta">
+      <span><b>课题类型</b>:评测体系 + 轻量路由</span>
+      <span><b>建议周期</b>:8–10 周</span>
+      <span><b>难度</b>:中(工程 + 少量统计)</span>
+      <span><b>导师</b>:____</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div class="card" style="margin-top:26px;">
+  <p class="lead" style="margin-top:0;">本文档是交给你的<strong>完整课题说明</strong>。读完你应当清楚:我们要解决什么问题、为什么这样设计、你要交付哪些东西、按什么节奏推进、怎样算验收通过。遇到"待确认事项"(见第 10 节)请先与导师对齐再动手,不要自行假设。</p>
+</div>
+
+<div class="toc">
+  <strong style="color:var(--navy);">目录</strong>
+  <ol>
+    <li><a href="#s1">背景与目标</a></li>
+    <li><a href="#s2">四条核心设计原则</a></li>
+    <li><a href="#s3">任务分类体系(核心)</a></li>
+    <li><a href="#s4">评分卡:rubric 与硬门槛</a></li>
+    <li><a href="#s5">评测方法论(小数据)</a></li>
+    <li><a href="#s6">路由器的演进路线</a></li>
+    <li><a href="#s7">交付物清单</a></li>
+    <li><a href="#s8">时间线与里程碑</a></li>
+    <li><a href="#s9">验收标准</a></li>
+    <li><a href="#s10">待确认事项 + 避坑</a></li>
+    <li><a href="#s11">附录:golden set 样例</a></li>
+  </ol>
+</div>
+
+<h2 id="s1"><span class="n">1</span>背景与目标</h2>
+<p>公司有一个内部基座模型,同时也可能接触到其它候选模型(尺寸/版本不同,或外部模型)。业务每天会涌入各种任务:从财报里抽数字、给客服对话分类意图、总结研报、回答投研问题……</p>
+<p>不同模型在不同任务上强弱差异很大,而且<strong>越强的模型越贵、越慢</strong>。我们想要一个机制:</p>
+<ul>
+  <li><strong>评测(离线)</strong>:用一套固定标准,量出"每个模型在每类任务上有多强",产出一张能力矩阵。</li>
+  <li><strong>路由(在线)</strong>:新任务进来时,自动判断它属于哪类,选出"能达标里最便宜"的模型。</li>
+</ul>
+<p class="lead">最大的约束:<strong>真实用例数量有限</strong>,无法靠大规模标注训练一个复杂路由器。本课题的全部设计都围绕"小数据下也成立"展开。</p>
+
+<div class="callout ok"><b>这件事的价值:</b>抽取、分类这类高频任务,大多数用便宜模型就能做好;只有少数复杂任务才需要贵模型。把它们分开路由,本身就能显著省钱 —— 这是项目的直接 ROI。</div>
+
+<h2 id="s2"><span class="n">2</span>四条核心设计原则</h2>
+<p>这四条决定了整个方案的形态,务必先理解再开工。</p>
+
+<div class="card">
+<h3>① 把"评测"和"路由"分开做</h3>
+<p>它们是两件事:评测是季度/版本更新时跑一次,产出"模型×任务类"打分表;路由是实时的,输入是新任务特征 + 那张表。<strong>评测是路由的输入。先把评测做扎实,路由初期就是一张查找表。</strong></p>
+</div>
+
+<div class="card">
+<h3>② 按任务"类别"路由,不按单个任务 —— 这是破解小数据的关键</h3>
+<p>单个任务级别的路由需要海量标注。但如果把用例聚成 5–10 个<strong>任务类</strong>(抽取 / 分类 / 摘要 / 问答…),你只需要刻画每个类,数据需求从"成百上千"降到"每类 20–50 条"。新任务来了先分类(比判断难度容易),再查"这个类哪个模型最优"。</p>
+</div>
+
+<div class="card">
+<h3>③ 能力是多维的,不要压成一个分数</h3>
+<p>一个排行榜数字会掩盖掉最关键的"按任务变化的强弱"。我们要的是矩阵 <code>[模型 × 任务类 → 质量分 + 通过率 + 时延 + 成本]</code>,而不是"模型 A 总分 87"。</p>
+</div>
+
+<div class="card">
+<h3>④ 金融场景有些维度是"硬门槛",不能进平均分</h3>
+<p>比如"编造了一个财务数字"。一个文笔流畅但把净利润数字编错的模型,在抽取类里应当<strong>直接判不合格</strong>,而不是靠流畅度把平均分拉回来。硬门槛是 pass/fail,凌驾于质量分之上。</p>
+</div>
+
+<h2 id="s3"><span class="n">3</span>任务分类体系(本课题的核心产物)</h2>
+<p>下面是初版 taxonomy,<strong>你要用公司真实用例去校验、补充、合并</strong>。每类都给了具体例子和"能区分模型强弱的难例"——这些难例就是你 golden set 里最该收的样本。</p>
+
+<h3>类 1 · 结构化抽取(表格 / 财务数据)</h3>
+<p>从财报 PDF 抽三大报表成 JSON;从研报抽"目标价/评级/盈利预测"成表;从减持公告抽"股东/比例/价格/时间窗"。</p>
+<div class="ex">
+  <div class="lbl">简单 CASE(便宜模型够)</div>
+  <pre>输入:一张干净的单页利润表
+输出:{"营业收入": 1234.5, "归母净利润": 89.0, "单位": "万元"}</pre>
+  <div class="lbl">能拉开模型差距的难例 ← 重点收集</div>
+  <ul style="margin-bottom:4px;">
+    <li><b>跨页续表</b>:表格断在两页,下半页没表头 → 弱模型丢行/错位</li>
+    <li><b>合并单元格 / 多级表头</b>:三列对齐错位</li>
+    <li><b>口径陷阱</b>:合并 vs 母公司、调整前 vs 调整后(脚注)抓错列</li>
+    <li><b>单位量纲</b>:万元/亿元/元混用,数字对但量级错</li>
+    <li><b>科目同名消歧</b>:不同表里同名科目含义不同</li>
+  </ul>
+</div>
+<p class="small">建议把本类拆成两个子类:<b>抽取·规整表</b>(便宜)与 <b>抽取·复杂版式</b>(强),分别路由。</p>
+
+<h3>类 2 · 意图识别 / 分类</h3>
+<p>客服意图(查净值/赎回/投诉/产品咨询/风险测评/转人工);公告类型;研报观点情感(看多/看空/中性);合规风险分级。</p>
+<div class="ex">
+  <div class="lbl">简单 CASE(便宜模型完胜,别用贵模型烧钱)</div>
+  <pre>"我想把上个月买的那个基金赎回一部分" → 赎回申购</pre>
+  <div class="lbl">难例</div>
+  <ul style="margin-bottom:4px;">
+    <li><b>多标签</b>:"收益这么差,我要投诉并赎回" → {投诉, 赎回}</li>
+    <li><b>边界模糊</b>:"这个产品还能买吗" = 咨询 还是 申购意图?</li>
+    <li><b>反讽/否定</b>:"这票还看多?早该清了" → 实为看空</li>
+    <li><b>长尾高代价类</b>:占比 1% 但漏判代价极高(投诉、合规高危)</li>
+  </ul>
+</div>
+
+<h3>类 3 · 长文摘要 / 要点提取</h3>
+<p>2 万字研报 → 投资逻辑 3 点 + 风险 2 点;业绩说明会纪要 → 关键边际变化。考验长上下文 + 抓重点 + <b>不脑补原文没有的数字/结论</b>。</p>
+
+<h3>类 4 · 文档问答 / 多步推理</h3>
+<p>"这家公司 Q1 毛利率为什么下滑?"(跨章节综合);"三家券商的分歧在哪?"(多文档对照);"这份财报触发我们风控哪几条?"(推理+规则匹配)。<b>这是强模型主场,不该为省钱降级。</b></p>
+
+<h3>类 5 · 改写 / 合规化 / 翻译</h3>
+<p>内部观点改成合规话术(删"必涨""稳赚");财经中英互译;对外脱敏。门槛是合规而非质量,可配规则后置校验。</p>
+
+<h3>类 6 · 数据规整 / 实体消歧</h3>
+<p>简称→统一代码;日期/单位归一;实体消歧(例:<code>001259 是利仁科技,不是国轩科技</code> —— 这种 LLM 凭记忆会答错)。便宜模型 + 词典兜底即可。</p>
+
+<h2 id="s4"><span class="n">4</span>评分卡:rubric 与硬门槛</h2>
+<p>每个任务类要配一张评分卡 = 几条质量 rubric(打分用) + 几条硬门槛(pass/fail)。示例:</p>
+
+<table>
+  <tr><th>任务类</th><th>质量 rubric(举例)</th><th>硬门槛(不过出局)</th></tr>
+  <tr><td>抽取·复杂版式</td><td>覆盖率、字段正确率、结构对齐</td><td><b>每个数字可逐字溯源、量纲正确、不补造科目</b></td></tr>
+  <tr><td>意图分类</td><td>整体准确率、边界一致性</td><td><b>"投诉/合规高危"召回率 ≥ 阈值</b></td></tr>
+  <tr><td>长文摘要</td><td>要点命中、精炼度</td><td><b>不引入原文没有的数字/论断</b></td></tr>
+  <tr><td>文档问答</td><td>正确性、推理链合理</td><td><b>结论有原文接地,不臆测</b></td></tr>
+  <tr><td>改写合规</td><td>语义保真、可读性</td><td><b>合规红线词 / 绝对化表述零容忍</b></td></tr>
+</table>
+
+<div class="callout gate"><b>硬门槛的意义:</b>金融场景里"编一个看起来合理的数字"比"漏一个数字"危险得多。硬门槛让这类错误一票否决,而不是被流畅度平均掉。每个任务类至少定义 1 条数字/事实忠实度门槛。</div>
+
+<h2 id="s5"><span class="n">5</span>评测方法论(专为小数据设计)</h2>
+<ol>
+  <li><b>先写 rubric,再跑模型。</b>不用调任何模型,却是最高杠杆的一步。</li>
+  <li><b>用成对比较(pairwise),不用绝对打分。</b>同样样本量,成对比较榨出的信号更多、更稳;多模型排序用 Elo / Bradley–Terry 聚合。绝对分主观漂移大。</li>
+  <li><b>LLM-as-judge + 人工校准。</b>抽 30–50 条让人也判一遍,算评委与人的一致性(Cohen's κ);κ 不达标就改 rubric 或换评委。<b>判数字对错的评委必须能调用计算/检索,不能凭语感。</b></li>
+  <li><b>刻意收集难例和失败例。</b>平均分会被高频简单任务稀释,决定路由的是边界。主动把模型翻车的 case 留进 golden set。</li>
+  <li><b>统计审慎(小 N 必踩):</b>你会看到一堆"A 比 B 高 2 分",大半是噪声。对成对结果做 bootstrap 置信区间;<b>差距没拉开就判平局、选更便宜的那个。</b></li>
+  <li><b>记录成本与时延</b>,和质量分并列进矩阵。</li>
+</ol>
+<p>产出 = 能力矩阵:<code>[模型 × 任务类 → 质量分 + 硬门槛通过率 + p95 时延 + 单位成本]</code>。</p>
+
+<h2 id="s6"><span class="n">6</span>路由器的演进路线 —— 别一上来就训分类器</h2>
+<table>
+  <tr><th>数据量</th><th>路由器形态</th><th>说明</th></tr>
+  <tr><td>几十条</td><td><b>决策表 / 规则</b></td><td>任务分类 → 查能力矩阵 → 选"过门槛里最便宜的"。可解释、可审计。</td></tr>
+  <tr><td>几百条</td><td><b>kNN / 向量检索路由</b></td><td>embedding 找最相似历史任务,看当时谁赢。抗过拟合、可解释。</td></tr>
+  <tr><td>上千条+</td><td>训练轻量分类器 / 在线学习</td><td>才考虑按单任务(而非按类)路由。</td></tr>
+</table>
+<div class="callout warn"><b>注意:</b>早期用学到的路由器在小数据上<b>必然过拟合</b>。规则表更稳、更可审计(金融还要可解释)。两个加分项:<br>① <b>质量×成本前沿</b>:路由不是选最强,是选"过质量线里最省的"。<br>② <b>级联(cascade)</b>:先上便宜模型,门槛不过或自评置信度低再升级强模型。<br>线上每次决策都记日志(任务→选了谁→结果)——这就是后续涨数据的来源,<b>路由系统自己产训练数据</b>。</div>
+
+<h2 id="s7"><span class="n">7</span>你要交付什么(Deliverables)</h2>
+<div class="card">
+  <div class="deliv"><div class="d-id">D1</div><div><b>任务分类体系文档</b> —— 用真实用例校验后的 5–10 个任务类:每类定义 + 3–5 条 rubric + 硬门槛 + 难例模板。(本文档第 3–4 节是初版,你要落地确认)</div></div>
+  <div class="deliv"><div class="d-id">D2</div><div><b>Golden set</b> —— 每类 20–50 条,含参考答案/标注,刻意覆盖难例;标注难度分层。附标注规范。</div></div>
+  <div class="deliv"><div class="d-id">D3</div><div><b>评测脚本</b> —— 跑成对比较 + LLM 评委 + 人工校准抽样 + bootstrap 置信区间;输出能力矩阵(含成本/时延)。</div></div>
+  <div class="deliv"><div class="d-id">D4</div><div><b>能力矩阵报告</b> —— <code>模型 × 任务类</code> 的质量/通过率/成本/时延,带置信区间;哪些差距是真的、哪些是噪声要写清。</div></div>
+  <div class="deliv"><div class="d-id">D5</div><div><b>路由决策表 v1</b> —— 任务类 → 默认模型 + 升级触发条件 + 硬门槛校验;可直接查表使用。</div></div>
+  <div class="deliv"><div class="d-id">D6</div><div><b>路由日志方案</b> —— 线上每次决策记录什么字段,供后续升级 kNN/分类器。</div></div>
+  <div class="deliv"><div class="d-id">D7</div><div><b>结题汇报</b> —— 方法、结论、省成本测算、下一步建议。</div></div>
+</div>
+
+<h2 id="s8"><span class="n">8</span>时间线与里程碑(建议 8–10 周)</h2>
+<table>
+  <tr><th>阶段</th><th>周次</th><th>产出</th></tr>
+  <tr><td>P0 立项对齐</td><td>W1</td><td>读懂本文档,与导师确认第 10 节待确认事项;收集现有用例</td></tr>
+  <tr><td>P1 任务分类</td><td>W1–W2</td><td><b>D1</b>:用例聚类成任务类 + 每类 rubric/门槛</td></tr>
+  <tr><td>P2 Golden set</td><td>W2–W4</td><td><b>D2</b>:每类样本 + 标注规范(含难例)</td></tr>
+  <tr><td>P3 评测搭建</td><td>W4–W6</td><td><b>D3</b>:成对比较 + 评委 + 校准 + 统计</td></tr>
+  <tr><td>P4 跑分出矩阵</td><td>W6–W7</td><td><b>D4</b>:能力矩阵报告</td></tr>
+  <tr><td>P5 路由表</td><td>W7–W8</td><td><b>D5+D6</b>:决策表 + 日志方案</td></tr>
+  <tr><td>P6 结题</td><td>W9–W10</td><td><b>D7</b>:汇报 + 省成本测算</td></tr>
+</table>
+<p class="small">注:这是建议节奏,实际按用例收集进度和导师反馈调整。P1 和 P2 最容易被低估,留足时间。</p>
+
+<h2 id="s9"><span class="n">9</span>验收标准</h2>
+<ul>
+  <li>任务分类体系覆盖了 ≥ 90% 的真实用例,边界清晰,导师评审通过。</li>
+  <li>Golden set 每类样本充足且含难例;标注规范可复现(两人标注一致性达标)。</li>
+  <li>评测可一键复跑;LLM 评委与人工一致性(κ)达到约定阈值。</li>
+  <li>能力矩阵的结论<b>带置信区间</b>,明确区分"真差距"与"噪声"。</li>
+  <li>路由决策表能对一批新任务给出合理选择,并通过硬门槛校验。</li>
+  <li>给出量化的<b>省成本测算</b>(对比"全用强模型" vs "按路由")。</li>
+</ul>
+
+<h2 id="s10"><span class="n">10</span>待确认事项 + 避坑</h2>
+<div class="callout warn">
+  <b>动手前请与导师确认(会改变方案细节):</b>
+  <ol style="margin:6px 0 0;">
+    <li><b>候选模型是谁?</b>是公司基座模型的不同尺寸/版本之间选,还是基座 vs 外部模型(GPT/Claude/Gemini)混合?——影响成本维度与合规约束。</li>
+    <li><b>路由是离线还是在线?</b>是"每条业务线提前定死用哪个模型"(那做完评测就够了),还是"每个请求实时路由"(才需要完整路由器)?</li>
+    <li>合规/数据安全边界:用例数据能否出内网?评委模型能否用外部 API?</li>
+    <li>各任务类的延迟/成本预算红线。</li>
+  </ol>
+</div>
+<div class="callout gate">
+  <b>常见坑:</b>
+  <ul style="margin:6px 0 0;">
+    <li>把能力压成一个总分 → 丢掉路由最需要的"按任务变化"。</li>
+    <li>用绝对打分而非成对比较 → 小数据下排名不稳。</li>
+    <li>盲信 LLM 评委、不做人工校准 → 评测本身就错。</li>
+    <li>用整体 accuracy 评分类 → 漏掉高代价长尾类(投诉/合规)。要看召回门槛。</li>
+    <li>小数据上训复杂路由器 → 过拟合。先用规则表。</li>
+    <li>为噪声做决策 → 差距没过置信区间就别区分,选便宜的。</li>
+  </ul>
+</div>
+
+<h2 id="s11"><span class="n">11</span>附录:Golden set 样例(照此格式标注)</h2>
+
+<div class="ex">
+  <div class="lbl">样例 A · 抽取·复杂版式(难例:跨页 + 调整后口径)</div>
+<pre>{
+  "task_class": "抽取-复杂版式",
+  "difficulty": "hard",
+  "input_ref": "2025年报_利润表_p87-88.pdf",
+  "note": "表跨第87-88页;存在'调整后'脚注列",
+  "reference": {
+    "营业收入": 5621000000,
+    "归母净利润": 388000000,
+    "口径": "调整后",
+    "单位": "元"
+  },
+  "hard_gates": ["数字逐字可溯源", "取'调整后'列", "量纲=元"]
+}</pre>
+</div>
+
+<div class="ex">
+  <div class="lbl">样例 B · 意图分类(难例:多标签 + 情绪)</div>
+<pre>{
+  "task_class": "意图分类",
+  "difficulty": "hard",
+  "input": "你们这产品亏成这样还好意思发营销短信?给我全赎回",
+  "reference_labels": ["投诉", "赎回申购"],
+  "hard_gates": ["'投诉'必须命中(高代价类不可漏)"]
+}</pre>
+</div>
+
+<div class="ex">
+  <div class="lbl">样例 C · 评测记录(成对比较一行)</div>
+<pre>{
+  "case_id": "extract_hard_017",
+  "model_A": "base-7B",  "model_B": "base-32B",
+  "winner": "B",
+  "judge": "llm-judge-v2", "human_check": "agree",
+  "A_gate_pass": false,  "B_gate_pass": true,
+  "A_cost": 0.0011, "B_cost": 0.0090,
+  "A_latency_ms": 820, "B_latency_ms": 2600
+}</pre>
+</div>
+
+<div class="callout ok"><b>路由表长什么样(D5 的一行):</b> <code>抽取·规整表 → 默认 base-7B</code> <span class="tag t-cheap">便宜</span>;升级触发:<code>页面含合并表头/跨页 → base-32B</code> <span class="tag t-strong">强</span>;硬门槛校验:<code>抽后数字回溯失败 → 打回/换强模型</code>。</div>
+
+<div class="footer">
+  <p><b>课题书 · 内部基座模型能力评测 + 任务路由系统</b> · 交付对象:实习生 · 导师审定后生效</p>
+  <p>本文档为内部研究/工程课题说明,所列模型名、数字、字段均为示意,以实际确认为准。</p>
+</div>
+
+</div>
+</body>
+</html>
