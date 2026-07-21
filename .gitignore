@@ -1,2 +1,4 @@
 .venv/
-模型选型与路由评测_实习生课题书.html
+llm.py
+ocr.py
+__pycache__
